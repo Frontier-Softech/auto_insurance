@@ -5,6 +5,13 @@ app_description = "Auto Insurance"
 app_email = "info@frontiersoftech.com"
 app_license = "mit"
 
+
+doc_events = {
+	"Sales Invoice": {
+		"before_submit": "auto_insurance.insurance_auto_pr.create_insurance_purchase_receipt"
+	}
+}
+
 # Apps
 # ------------------
 
