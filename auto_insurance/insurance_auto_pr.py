@@ -83,7 +83,7 @@ def create_pr_for_item(sales_invoice, item_data):
         "uom": si_item.uom,
         "stock_uom": si_item.stock_uom,
         "conversion_factor": si_item.conversion_factor or 1,
-        "rate": item_price_list or si_item.rate,
+        "rate": item_price_list,
         "warehouse": si_item.warehouse,
         "branch": si_item.branch,
     })
