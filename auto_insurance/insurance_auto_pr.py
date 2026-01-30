@@ -72,6 +72,8 @@ def create_pr_for_item(sales_invoice, item_data):
     # Set dummy invoice attachment (mandatory field) - to be replaced when actual invoice arrives
     pr.custom_invoice_attachment = "/files/auto-pr-placeholder.txt"
 
+    item_price_list = frappe.db.get_value("Item Price", {"item_code" : si_item.item_code, "price_list": "Standard Buying"}, "price_list_rate")
+
     # Add the item to PR
     pr.append("items", {
         "item_code": si_item.item_code,
@@ -81,7 +83,7 @@ def create_pr_for_item(sales_invoice, item_data):
         "uom": si_item.uom,
         "stock_uom": si_item.stock_uom,
         "conversion_factor": si_item.conversion_factor or 1,
-        "rate": si_item.rate,
+        "rate": item_price_list or si_item.rate,
         "warehouse": si_item.warehouse,
         "branch": si_item.branch,
     })
