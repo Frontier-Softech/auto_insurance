@@ -88,6 +88,9 @@ def create_pr_for_item(sales_invoice, item_data):
         "branch": si_item.branch,
     })
 
+    pr.run_method("set_missing_values")
+    pr.run_method("calculate_taxes_and_totals")
+
     # Insert the PR
     pr.insert(ignore_permissions=True)
 
