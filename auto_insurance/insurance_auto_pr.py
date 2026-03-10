@@ -61,6 +61,8 @@ def create_pr_for_item(sales_invoice, item_data):
     supplier = item_data["supplier"]
     insurance_sr_no = item_data["insurance_sr_no"]
 
+    rejected_warehouse = frappe.db.get_value("Warehouse", {"is_rejected_warehouse": 1, "company": sales_invoice.company}, "name")
+
     # Create new Purchase Receipt
     pr = frappe.new_doc("Purchase Receipt")
     pr.supplier = supplier
@@ -68,7 +70,7 @@ def create_pr_for_item(sales_invoice, item_data):
     pr.posting_date = sales_invoice.posting_date
     pr.posting_time = sales_invoice.posting_time
     pr.branch = sales_invoice.branch
-
+    pr.rejected_warehouse = rejected_warehouse
     # Set dummy invoice attachment (mandatory field) - to be replaced when actual invoice arrives
     pr.custom_invoice_attachment = "/files/auto-pr-placeholder.txt"
 
