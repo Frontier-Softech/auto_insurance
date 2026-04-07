@@ -2,6 +2,10 @@
 # Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+from pydoc import doc
+
+from pydoc import doc
+
 import frappe
 from frappe import _
 
@@ -11,47 +15,57 @@ def create_insurance_purchase_receipt(doc, method=None):
     Each insurance item with a serial number gets its own Purchase Receipt,
     named after the Insurance Serial No from the item row.
     """
+    if doc.is_return:
+        for item in doc.items:
+            if item.custom_insurance_sr_no:
+                # Assuming custom_insurance_sr_no stores Purchase Receipt name
+                pr_name = item.custom_insurance_sr_no
 
-    # Check if any items need auto PR
-    items_needing_pr = []
+                if frappe.db.exists("Purchase Receipt", pr_name):
+                    pr_doc = frappe.get_doc("Purchase Receipt", pr_name)
 
-    for item in doc.items:
-        # Get item's custom_item_category (Link to Item Category)
-        item_category = frappe.db.get_value("Item", item.item_code, "custom_item_category")
+                    if pr_doc.docstatus == 1:  # Submitted
+                        pr_doc.cancel()
+    else:                        
+        items_needing_pr = []
 
-        if not item_category:
-            continue
+        for item in doc.items:
+            # Get item's custom_item_category (Link to Item Category)
+            item_category = frappe.db.get_value("Item", item.item_code, "custom_item_category")
 
-        # Check if auto PR is enabled for this item category
-        # Note: field name has typo "reciept" in the database
-        auto_pr = frappe.db.get_value("Item Category", item_category, "generate_auto_purchase_reciept")
+            if not item_category:
+                continue
 
-        if not auto_pr:
-            continue
+            # Check if auto PR is enabled for this item category
+            # Note: field name has typo "reciept" in the database
+            auto_pr = frappe.db.get_value("Item Category", item_category, "generate_auto_purchase_reciept")
 
-        # Get supplier for this item category
-        category_supplier = frappe.db.get_value("Item Category", item_category, "category_supplier")
+            if not auto_pr:
+                continue
 
-        if not category_supplier:
-            frappe.throw(_("Category Supplier not set for Item Category: {0}").format(item_category))
+            # Get supplier for this item category
+            category_supplier = frappe.db.get_value("Item Category", item_category, "category_supplier")
 
-        # Validate insurance serial number exists on the item row
-        if not item.custom_insurance_sr_no:
-            frappe.throw(_("Insurance Serial No is mandatory for item: {0}").format(item.item_name))
+            if not category_supplier:
+                frappe.throw(_("Category Supplier not set for Item Category: {0}").format(item_category))
 
-        items_needing_pr.append({
-            "item": item,
-            "supplier": category_supplier,
-            "insurance_sr_no": item.custom_insurance_sr_no
-        })
+            # Validate insurance serial number exists on the item row
+            if not item.custom_insurance_sr_no:
+                frappe.throw(_("Insurance Serial No is mandatory for item: {0}").format(item.item_name))
 
-    # If no items need PR, exit
-    if not items_needing_pr:
-        return
+            items_needing_pr.append({
+                "item": item,
+                "supplier": category_supplier,
+                "insurance_sr_no": item.custom_insurance_sr_no
+            })
 
-    # Create Purchase Receipt for each insurance item
-    for item_data in items_needing_pr:
-        create_pr_for_item(doc, item_data)
+        # If no items need PR, exit
+        if not items_needing_pr:
+            return
+
+        # Create Purchase Receipt for each insurance item
+        for item_data in items_needing_pr:
+            create_pr_for_item(doc, item_data)
 
 
 def create_pr_for_item(sales_invoice, item_data):
