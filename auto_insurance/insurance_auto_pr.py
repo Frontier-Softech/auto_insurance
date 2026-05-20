@@ -76,9 +76,20 @@ def create_pr_for_item(sales_invoice, item_data):
     insurance_sr_no = item_data["insurance_sr_no"]
 
     rejected_warehouse = frappe.db.get_value("Warehouse", {"is_rejected_warehouse": 1, "company": sales_invoice.company}, "name")
+    
+    # place of supply
+    address = frappe.db.get_value(
+        "Address",
+        sales_invoice.company_address,
+        ["gst_state_number", "gst_state"],
+        as_dict=True
+    )
 
+    place_of_supply = f"{address.gst_state_number}-{address.gst_state}"
+    
     # Create new Purchase Receipt
     pr = frappe.new_doc("Purchase Receipt")
+    pr.place_of_supply = place_of_supply
     pr.supplier = supplier
     pr.set_posting_time = 1
     pr.posting_date = sales_invoice.posting_date
