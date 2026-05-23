@@ -16,16 +16,17 @@ def create_insurance_purchase_receipt(doc, method=None):
     named after the Insurance Serial No from the item row.
     """
     if doc.is_return:
-        for item in doc.items:
-            if item.custom_insurance_sr_no:
-                # Assuming custom_insurance_sr_no stores Purchase Receipt name
-                pr_name = item.custom_insurance_sr_no
+        # for item in doc.items:
+        #     if item.custom_insurance_sr_no:
+        #         # Assuming custom_insurance_sr_no stores Purchase Receipt name
+        #         pr_name = item.custom_insurance_sr_no
 
-                if frappe.db.exists("Purchase Receipt", pr_name):
-                    pr_doc = frappe.get_doc("Purchase Receipt", pr_name)
+        #         if frappe.db.exists("Purchase Receipt", pr_name):
+        #             pr_doc = frappe.get_doc("Purchase Receipt", pr_name)
 
-                    if pr_doc.docstatus == 1:  # Submitted
-                        pr_doc.cancel()
+        #             if pr_doc.docstatus == 1:  # Submitted
+        #                 pr_doc.cancel()
+        return
     else:                        
         items_needing_pr = []
 
