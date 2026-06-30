@@ -44,14 +44,15 @@ def create_insurance_purchase_receipt(doc, method=None):
             if not auto_pr:
                 continue
 
-            # Get supplier for this item category based on the invoice company
-            category_supplier = frappe.db.get_value(
+            # Get supplier and supplier_address for this item category based on the invoice company
+            category_row = frappe.db.get_value(
                 "Item Category Supplier",
                 {"parent": item_category, "company": doc.company},
-                "supplier",
+                ["supplier", "supplier_address"],
+                as_dict=True,
             )
 
-            if not category_supplier:
+            if not category_row or not category_row.supplier:
                 frappe.throw(
                     _("Category Supplier not set for Item Category {0} and Company {1}").format(
                         item_category, doc.company
@@ -64,7 +65,8 @@ def create_insurance_purchase_receipt(doc, method=None):
 
             items_needing_pr.append({
                 "item": item,
-                "supplier": category_supplier,
+                "supplier": category_row.supplier,
+                "supplier_address": category_row.supplier_address,
                 "insurance_sr_no": item.custom_insurance_sr_no
             })
 
@@ -101,6 +103,7 @@ def create_pr_for_item(sales_invoice, item_data):
     pr.company = sales_invoice.company
     pr.place_of_supply = place_of_supply
     pr.supplier = supplier
+    pr.supplier_address = item_data.get("supplier_address")
     pr.set_posting_time = 1
     pr.posting_date = sales_invoice.posting_date
     pr.posting_time = sales_invoice.posting_time
