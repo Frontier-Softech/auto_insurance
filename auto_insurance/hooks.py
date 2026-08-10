@@ -8,7 +8,8 @@ app_license = "mit"
 
 doc_events = {
 	"Sales Invoice": {
-		"before_submit": "auto_insurance.insurance_auto_pr.create_insurance_purchase_receipt"
+		"validate": "auto_insurance.insurance_v2.validators.validate_insurance_supplier",
+		"before_submit": "auto_insurance.insurance_v2.auto_pr.create_insurance_purchase_receipt"
 	}
 }
 

@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
+#
+# DEPRECATED — no longer wired in hooks.py.
+# Superseded by auto_insurance.insurance_v2.auto_pr (reads supplier + address from
+# the Sales Invoice item row instead of Item Category Supplier table).
+# Kept as reference only. Do not re-wire without discussing with the user.
 
 from pydoc import doc
 
