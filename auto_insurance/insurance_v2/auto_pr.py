@@ -74,6 +74,8 @@ def _create_pr_for_item(sales_invoice, si_item, supplier, supplier_address):
 
 	pr = frappe.new_doc("Purchase Receipt")
 	pr.company = sales_invoice.company
+	pr.billing_address = sales_invoice.company_address
+	pr.shipping_address = sales_invoice.company_address
 	pr.place_of_supply = place_of_supply
 	pr.supplier = supplier
 	pr.supplier_address = supplier_address
